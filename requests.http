@@ -1,0 +1,73 @@
+@baseUrl = http://localhost:3000/api
+
+### 1) السيرفر عايش؟
+GET {{baseUrl}}/health
+
+### 2) تسجيل مستخدم جديد
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Taha",
+  "email": "taha@demo.com",
+  "password": "secret123"
+}
+
+### 3) تسجيل دخول
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "taha@demo.com",
+  "password": "secret123"
+}
+
+### التوكن بيتاخد أوتوماتيك من رد الـ login اللي فوق
+@token = {{login.response.body.token}}
+
+### 4) بياناتي (محمي - محتاج توكن)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### ============ حالات الفشل - جرّبها كمان ============
+
+### 5) نفس الإيميل تاني  →  409
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Taha",
+  "email": "taha@demo.com",
+  "password": "secret123"
+}
+
+### 6) بيانات غلط  →  400
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "name": "Yo",
+  "email": "not-an-email",
+  "password": "123"
+}
+
+### 7) باسورد غلط  →  401
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "taha@demo.com",
+  "password": "wrong-password"
+}
+
+### 8) /me من غير توكن  →  401
+GET {{baseUrl}}/auth/me
+
+### 9) /me بتوكن مزوّر  →  401
+GET {{baseUrl}}/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fake.token
+
+### 10) URL مش موجود  →  404
+GET {{baseUrl}}/nope

@@ -1,23 +1,27 @@
 import express from "express";
+import authRoutes from "./routes/authRoutes.js";
+import { notFound, errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
 
 // يقرا الـ JSON اللي جاي في الـ request body ويحطه في req.body
 app.use(express.json());
 
+// في Express 5 لو مفيش body أصلاً، req.body بيفضل undefined
+// السطر ده بيخليها {} عشان الـ controllers ما تقعش وهي بتقرا منها
+app.use((req, res, next) => {
+  if (!req.body) req.body = {};
+  next();
+});
+
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", uptime: process.uptime() });
 });
 
-// أي URL مش متعرّف
-app.use((req, res) => {
-  res.status(404).json({ message: `Route not found: ${req.method} ${req.originalUrl}` });
-});
+app.use("/api/auth", authRoutes);
 
-// معالج الأخطاء العام - لازم ياخد 4 arguments عشان Express يعرفه
-app.use((err, req, res, next) => {
-  console.error(err);
-  res.status(err.status || 500).json({ message: err.message || "Internal server error" });
-});
+// لازم يفضلوا آخر حاجة، وبالترتيب ده
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;
