@@ -140,3 +140,62 @@ GET {{baseUrl}}/posts/not-an-id
 
 ### 21) id سليم بس مش موجود  →  404
 GET {{baseUrl}}/posts/000000000000000000000000
+
+### ==================== الكومنتات ====================
+
+### 22) كومنتات بوست (مفتوح للكل)
+GET {{baseUrl}}/posts/{{postId}}/comments
+
+### 23) كومنت جديد (محمي)
+# @name createComment
+POST {{baseUrl}}/posts/{{postId}}/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "تعليق حلو على البوست ده"
+}
+
+### الـ id بيتاخد أوتوماتيك من الكومنت اللي فوق
+@commentId = {{createComment.response.body.comment._id}}
+
+### 24) تعديل الكومنت (لصاحبه بس)
+PATCH {{baseUrl}}/comments/{{commentId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "تعليق معدّل"
+}
+
+### 25) مسح الكومنت (لصاحبه أو لصاحب البوست)
+DELETE {{baseUrl}}/comments/{{commentId}}
+Authorization: Bearer {{token}}
+
+### ============ حالات الفشل ============
+
+### 26) كومنت من غير توكن  →  401
+POST {{baseUrl}}/posts/{{postId}}/comments
+Content-Type: application/json
+
+{
+  "content": "مش هينفع"
+}
+
+### 27) كومنت فاضي  →  400
+POST {{baseUrl}}/posts/{{postId}}/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": ""
+}
+
+### 28) كومنت على بوست مش موجود  →  404
+POST {{baseUrl}}/posts/000000000000000000000000/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "بوست وهمي"
+}

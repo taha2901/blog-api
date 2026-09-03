@@ -1,6 +1,7 @@
 import express from "express";
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
+import commentRoutes from "./routes/commentRoutes.js";
 import { notFound, errorHandler } from "./middlewares/errorHandler.js";
 
 const app = express();
@@ -21,6 +22,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/posts", postRoutes);
+app.use("/api/comments", commentRoutes);
 
 // لازم يفضلوا آخر حاجة، وبالترتيب ده
 app.use(notFound);

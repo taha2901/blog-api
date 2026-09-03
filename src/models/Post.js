@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Comment from "./Comment.js";
 
 const postSchema = new mongoose.Schema(
   {
@@ -29,5 +30,10 @@ const postSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// لما البوست يتمسح، امسح كومنتاته معاه عشان ما يفضلوش أيتام في الداتابيز
+postSchema.pre("deleteOne", { document: true, query: false }, async function () {
+  await Comment.deleteMany({ post: this._id });
+});
 
 export default mongoose.model("Post", postSchema);
