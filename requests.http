@@ -71,3 +71,72 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.fake.token
 
 ### 10) URL مش موجود  →  404
 GET {{baseUrl}}/nope
+
+### ==================== البوستات ====================
+
+### 11) قايمة البوستات (مفتوح للكل)
+GET {{baseUrl}}/posts
+
+### 12) مع pagination
+GET {{baseUrl}}/posts?page=1&limit=5
+
+### 13) فلترة بالتاج
+GET {{baseUrl}}/posts?tag=node
+
+### 14) بوست جديد (محمي)
+# @name createPost
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "أول بوست ليا",
+  "content": "ده محتوى البوست، لازم يكون ١٠ حروف على الأقل",
+  "tags": ["node", "express"]
+}
+
+### الـ id بيتاخد أوتوماتيك من البوست اللي اتعمل فوق
+@postId = {{createPost.response.body.post._id}}
+
+### 15) بوست واحد
+GET {{baseUrl}}/posts/{{postId}}
+
+### 16) تعديل البوست (لصاحبه بس)
+PATCH {{baseUrl}}/posts/{{postId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "عنوان معدّل"
+}
+
+### 17) مسح البوست (لصاحبه بس)
+DELETE {{baseUrl}}/posts/{{postId}}
+Authorization: Bearer {{token}}
+
+### ============ حالات الفشل ============
+
+### 18) بوست من غير توكن  →  401
+POST {{baseUrl}}/posts
+Content-Type: application/json
+
+{
+  "title": "مش هينفع",
+  "content": "مفيش توكن مع الطلب ده"
+}
+
+### 19) بيانات ناقصة  →  400
+POST {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "a",
+  "content": "b"
+}
+
+### 20) id شكله غلط  →  400
+GET {{baseUrl}}/posts/not-an-id
+
+### 21) id سليم بس مش موجود  →  404
+GET {{baseUrl}}/posts/000000000000000000000000
